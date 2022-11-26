@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -40,7 +42,15 @@ public class UserControllerTest {
 		TestUtils.injectObjects(userController, "userRepository", userRepo);
 		TestUtils.injectObjects(userController, "cartRepository", cartRepo);
 		TestUtils.injectObjects(userController, "passwordEncoder", encoder);
-
+		
+	}
+	
+	private User initSampleUser() {
+		User u = new User();
+		u.setId(1L);
+		u.setUsername("mockUser");
+		u.setPassword("myHashedPassword");
+		return u;
 	}
 	
 	@Test
@@ -68,5 +78,59 @@ public class UserControllerTest {
 		assertEquals(u.getUsername(), "test");
 		assertEquals(u.getPassword(), "passwordIsHashed");
 		
+	}
+	
+	@Test
+	public void shouldNot_createUser_passwordDoNotMatch() throws Exception {
+		
+		CreateUserRequest r = new CreateUserRequest();
+		r.setUsername("test");
+		r.setPassword("password");
+		r.setConfirmPassword("passwordNotMatch");
+		
+		final ResponseEntity<User> response = userController.createUser(r);
+		assertNotNull(response);
+		assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@Test
+	public void shouldNot_creatUser_userAlreadyExists() throws Exception {
+		
+		/**
+		 * Mock findByUsername method, whenever this method is called
+		 * always return new User object.
+		 */
+		when(userRepo.findByUsername("test")).thenReturn(new User());
+		
+		CreateUserRequest r = new CreateUserRequest();
+		r.setUsername("test");
+		r.setPassword("password");
+		r.setConfirmPassword("password");
+		
+		final ResponseEntity<User> response = userController.createUser(r);
+		assertNotNull(response);
+		assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@Test
+	public void should_findById() throws Exception {
+		
+		/**
+		 * Mock findById, return sampleUser.
+		 */
+		User sampleUser = initSampleUser();
+		Optional<User> userOptional = Optional.of(sampleUser);
+		when(userRepo.findById(1L)).thenReturn(userOptional);
+		
+		ResponseEntity<User> response = userController.findById(1L);
+		assertNotNull(response);
+		assertEquals(response.getStatusCode(), HttpStatus.OK);
+		
+		User u = response.getBody();
+		assertNotNull(u);
+		
+		assertEquals(u.getId(), sampleUser.getId());
+		assertEquals(u.getUsername(), sampleUser.getUsername());
+		assertEquals(u.getPassword(), sampleUser.getPassword());
 	}
 }
