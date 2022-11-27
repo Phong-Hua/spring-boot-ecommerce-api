@@ -1,5 +1,8 @@
 package com.example.demo.controllers;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,6 +32,8 @@ public class UserController {
 	@Autowired
 	private CartRepository cartRepository;
 
+	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+	
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		return ResponseEntity.of(userRepository.findById(id));
@@ -45,11 +50,11 @@ public class UserController {
 		
 		boolean exist = userRepository.findByUsername(createUserRequest.getUsername()) != null;
 		if (exist) {
-			System.out.println("User already exists.");
+			log.error("User already exists.");
 			return ResponseEntity.badRequest().build();
 		}
 		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
-			System.out.println("Passwords do not match.");
+			log.error("Passwords do not match.");
 			return ResponseEntity.badRequest().build();
 		}
 		
