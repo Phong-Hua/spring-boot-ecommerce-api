@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import com.example.demo.exceptions.UserException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -80,20 +81,18 @@ public class UserControllerTest {
 		
 	}
 	
-	@Test
+	@Test(expected = UserException.class)
 	public void shouldNot_createUser_passwordDoNotMatch() throws Exception {
 		
 		CreateUserRequest r = new CreateUserRequest();
 		r.setUsername("test");
 		r.setPassword("password");
 		r.setConfirmPassword("passwordNotMatch");
-		
-		final ResponseEntity<User> response = userController.createUser(r);
-		assertNotNull(response);
-		assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+		userController.createUser(r);
 	}
 	
-	@Test
+	@Test(expected = UserException.class)
 	public void shouldNot_creatUser_userAlreadyExists() throws Exception {
 		
 		/**
@@ -107,9 +106,7 @@ public class UserControllerTest {
 		r.setPassword("password");
 		r.setConfirmPassword("password");
 		
-		final ResponseEntity<User> response = userController.createUser(r);
-		assertNotNull(response);
-		assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+		userController.createUser(r);
 	}
 	
 	@Test

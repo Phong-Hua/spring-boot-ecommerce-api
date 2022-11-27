@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.exceptions.UserException;
 import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
@@ -51,11 +52,11 @@ public class UserController {
 		boolean exist = userRepository.findByUsername(createUserRequest.getUsername()) != null;
 		if (exist) {
 			log.error("User already exists.");
-			return ResponseEntity.badRequest().build();
+			throw new UserException("User already exists.");
 		}
 		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
 			log.error("Passwords do not match.");
-			return ResponseEntity.badRequest().build();
+			throw new UserException("Passwords do not match.");
 		}
 		
 		User user = new User();
