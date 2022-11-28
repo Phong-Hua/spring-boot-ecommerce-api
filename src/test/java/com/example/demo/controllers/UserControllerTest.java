@@ -130,4 +130,30 @@ public class UserControllerTest {
 		assertEquals(u.getUsername(), sampleUser.getUsername());
 		assertEquals(u.getPassword(), sampleUser.getPassword());
 	}
+
+	@Test(expected = UserException.class)
+	public void shouldNot_findById() throws Exception {
+		long id = 1L;
+		when(userRepo.findById(id)).thenReturn(Optional.empty());
+		userController.findById(id);
+	}
+
+	@Test
+	public void should_findByUsername() throws Exception {
+		User sampleUser = initSampleUser();
+		when (userRepo.findByUsername(sampleUser.getUsername())).thenReturn(sampleUser);
+		ResponseEntity<User> response = userController.findByUserName(sampleUser.getUsername());
+
+		User u = response.getBody();
+		assertEquals(u.getUsername(), sampleUser.getUsername());
+		assertEquals(u.getPassword(), sampleUser.getPassword());
+		assertEquals(u.getId(), sampleUser.getId());
+	}
+
+	@Test(expected = UserException.class)
+	public void shouldnot_findByUsername() throws Exception {
+		String username = "mockuser";
+		when (userRepo.findByUsername(username)).thenReturn(null);
+		ResponseEntity<User> response = userController.findByUserName(username);
+	}
 }

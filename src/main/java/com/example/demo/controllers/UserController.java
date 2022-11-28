@@ -20,6 +20,8 @@ import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -37,13 +39,19 @@ public class UserController {
 	
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
-		return ResponseEntity.of(userRepository.findById(id));
+		Optional<User> optionalUser = userRepository.findById(id);
+		if (!optionalUser.isPresent())
+			throw new UserException("User with id not found - " + id);
+		return ResponseEntity.ok(optionalUser.get());
 	}
 	
 	@GetMapping("/{username}")
 	public ResponseEntity<User> findByUserName(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
-		return user == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(user);
+		if (user == null) {
+			throw new UserException("User with username not found - " + username);
+		}
+		return ResponseEntity.ok(user);
 	}
 	
 	@PostMapping("/create")
