@@ -7,7 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import com.example.demo.exceptions.UserException;
+import com.example.demo.exceptions.APIBadRequestException;
+import com.example.demo.exceptions.APINotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -81,7 +82,7 @@ public class UserControllerTest {
 		
 	}
 	
-	@Test(expected = UserException.class)
+	@Test(expected = APIBadRequestException.class)
 	public void shouldNot_createUser_passwordDoNotMatch() throws Exception {
 		
 		CreateUserRequest r = new CreateUserRequest();
@@ -92,7 +93,7 @@ public class UserControllerTest {
 		userController.createUser(r);
 	}
 	
-	@Test(expected = UserException.class)
+	@Test(expected = APIBadRequestException.class)
 	public void shouldNot_creatUser_userAlreadyExists() throws Exception {
 		
 		/**
@@ -131,7 +132,7 @@ public class UserControllerTest {
 		assertEquals(u.getPassword(), sampleUser.getPassword());
 	}
 
-	@Test(expected = UserException.class)
+	@Test(expected = APINotFoundException.class)
 	public void shouldNot_findById() throws Exception {
 		long id = 1L;
 		when(userRepo.findById(id)).thenReturn(Optional.empty());
@@ -150,7 +151,7 @@ public class UserControllerTest {
 		assertEquals(u.getId(), sampleUser.getId());
 	}
 
-	@Test(expected = UserException.class)
+	@Test(expected = APINotFoundException.class)
 	public void shouldnot_findByUsername() throws Exception {
 		String username = "mockuser";
 		when (userRepo.findByUsername(username)).thenReturn(null);

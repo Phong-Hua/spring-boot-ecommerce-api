@@ -1,9 +1,12 @@
 package com.example.demo.controllers;
 
 
+import com.example.demo.exceptions.APIBadRequestException;
+import com.example.demo.exceptions.APINotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.exceptions.UserException;
 import com.example.demo.model.persistence.Cart;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
@@ -41,7 +43,7 @@ public class UserController {
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		Optional<User> optionalUser = userRepository.findById(id);
 		if (!optionalUser.isPresent())
-			throw new UserException("User with id not found - " + id);
+			throw new APINotFoundException("User with id not found - " + id);
 		return ResponseEntity.ok(optionalUser.get());
 	}
 	
@@ -49,7 +51,7 @@ public class UserController {
 	public ResponseEntity<User> findByUserName(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
 		if (user == null) {
-			throw new UserException("User with username not found - " + username);
+			throw new APINotFoundException("User not found - username: " + username);
 		}
 		return ResponseEntity.ok(user);
 	}
@@ -60,11 +62,11 @@ public class UserController {
 		boolean exist = userRepository.findByUsername(createUserRequest.getUsername()) != null;
 		if (exist) {
 			log.error("User already exists.");
-			throw new UserException("User already exists.");
+			throw new APIBadRequestException("User already exists.");
 		}
 		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
 			log.error("Passwords do not match.");
-			throw new UserException("Passwords do not match.");
+			throw new APIBadRequestException("Passwords do not match.");
 		}
 		
 		User user = new User();
