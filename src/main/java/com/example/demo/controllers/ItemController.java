@@ -1,7 +1,9 @@
 package com.example.demo.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.example.demo.exceptions.APINotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,15 +28,18 @@ public class ItemController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Item> getItemById(@PathVariable Long id) {
-		return ResponseEntity.of(itemRepository.findById(id));
+		Optional<Item> itemOptional = itemRepository.findById(id);
+		if (!itemOptional.isPresent())
+			throw new APINotFoundException("Item not found - id: " + id);
+		return ResponseEntity.ok(itemOptional.get());
 	}
 	
 	@GetMapping("/name/{name}")
 	public ResponseEntity<List<Item>> getItemsByName(@PathVariable String name) {
 		List<Item> items = itemRepository.findByName(name);
-		return items == null || items.isEmpty() ? ResponseEntity.notFound().build()
-				: ResponseEntity.ok(items);
-			
+		if (items == null || items.isEmpty())
+			throw new APINotFoundException("Item not found - name: " + name);
+		return ResponseEntity.ok(items);
 	}
 	
 }
