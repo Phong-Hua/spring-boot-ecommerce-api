@@ -2,6 +2,8 @@ package com.example.demo.controllers;
 
 import java.util.List;
 
+import com.example.demo.exceptions.APIBadRequestException;
+import com.example.demo.exceptions.APINotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +22,6 @@ import com.example.demo.model.persistence.repositories.UserRepository;
 @RequestMapping("/api/order")
 public class OrderController {
 	
-	
 	@Autowired
 	private UserRepository userRepository;
 	
@@ -32,9 +33,13 @@ public class OrderController {
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			return ResponseEntity.notFound().build();
+			throw new APINotFoundException("User not found - username: " + username);
+		}
+		if (user.getCart().getItems() == null || user.getCart().getItems().isEmpty()) {
+			throw new APIBadRequestException("Cart is empty.");
 		}
 		UserOrder order = UserOrder.createFromCart(user.getCart());
+		user.getCart().emptyCart();
 		orderRepository.save(order);
 		return ResponseEntity.ok(order);
 	}
@@ -43,7 +48,7 @@ public class OrderController {
 	public ResponseEntity<List<UserOrder>> getOrdersForUser(@PathVariable String username) {
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			return ResponseEntity.notFound().build();
+			throw new APINotFoundException("User not found - username: " + username);
 		}
 		return ResponseEntity.ok(orderRepository.findByUser(user));
 	}

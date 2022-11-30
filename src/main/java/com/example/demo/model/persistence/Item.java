@@ -39,4 +39,17 @@ public class Item {
 	@JsonProperty
 	private @Getter @Setter String description;
 
+	public Item() {
+	}
+
+	public Item(Long id, String name, BigDecimal price, String description) {
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.description = description;
+	}
+
+	public Item clone() {
+		return new Item(this.id, this.name, this.price, this.description);
+	}
 }
