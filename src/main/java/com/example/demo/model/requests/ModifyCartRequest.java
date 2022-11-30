@@ -1,42 +1,25 @@
 package com.example.demo.model.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class ModifyCartRequest {
 	
 	@JsonProperty
-	private String username;
+	private @Getter @Setter String username;
 	
 	@JsonProperty
-	private long itemId;
+	private @Getter @Setter long itemId;
 	
 	@JsonProperty
-	private int quantity;
+	private @Getter @Setter int quantity;
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
+	public ModifyCartRequest(String username, long itemId, int quantity) {
 		this.username = username;
-	}
-
-	public long getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(long itemId) {
 		this.itemId = itemId;
-	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	
-	
-
 }

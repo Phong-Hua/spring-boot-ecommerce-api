@@ -69,6 +69,16 @@ public class User {
 		this.password = password;
 	}
 
+	public User() {
+	}
+
+	public User(long id, String username, String password, Cart cart) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.cart = cart;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", cart=" + cart + "]";
