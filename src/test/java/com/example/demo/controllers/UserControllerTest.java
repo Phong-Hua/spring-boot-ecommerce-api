@@ -56,18 +56,18 @@ public class UserControllerTest {
 	}
 	
 	@Test
-	public void should_createUser() throws Exception {
+	public void should_createUser() {
 		
 		/** 
 		 * Since encoder is a mock object, whenever the encode method is called with the "pass" parameter, 
 		 * it will return "passwordIsHashed" value 
 		 */
-		when(encoder.encode("pass")).thenReturn("passwordIsHashed");
+		when(encoder.encode("password")).thenReturn("passwordIsHashed");
 		
 		CreateUserRequest r = new CreateUserRequest();
 		r.setUsername("test");
-		r.setPassword("pass");
-		r.setConfirmPassword("pass");
+		r.setPassword("password");
+		r.setConfirmPassword("password");
 		
 		final ResponseEntity<User> response = userController.createUser(r);
 		assertNotNull(response);
@@ -81,7 +81,18 @@ public class UserControllerTest {
 		assertEquals(u.getPassword(), "passwordIsHashed");
 		
 	}
-	
+
+	@Test(expected = APIBadRequestException.class)
+	public void shouldNot_createUser_passwordShorterThan7Characters() {
+
+		CreateUserRequest r = new CreateUserRequest();
+		r.setUsername("test");
+		r.setPassword("pass");
+		r.setConfirmPassword("pass");
+
+		userController.createUser(r);
+	}
+
 	@Test(expected = APIBadRequestException.class)
 	public void shouldNot_createUser_passwordDoNotMatch() throws Exception {
 		

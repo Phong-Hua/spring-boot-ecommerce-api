@@ -68,7 +68,10 @@ public class UserController {
 			log.error("Passwords do not match.");
 			throw new APIBadRequestException("Passwords do not match.");
 		}
-		
+		if (createUserRequest.getPassword().length() < 7) {
+			log.error("Password length requirement does not meet.");
+			throw new APIBadRequestException("Password must be at least 7 characters.");
+		}
 		User user = new User();
 
 		user.setUsername(createUserRequest.getUsername());
